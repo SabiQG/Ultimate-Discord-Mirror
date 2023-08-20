@@ -1,7 +1,7 @@
 {
   "name": "discord-mirror",
   "version": "1.0.0",
-  "description": "Discord user server clonner and mirror",
+  "description": "Discord user server cloner and mirror",
   "main": "main.js",
   "type": "module",
   "scripts": {
