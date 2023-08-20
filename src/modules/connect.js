@@ -1,5 +1,4 @@
 import web_socket from 'ws';
-import zlib from 'zlib-sync';
 
 import ws_auth_payload from '../workers/ws_auth_payload.js';
 import send_message from '../workers/send_message.js';
@@ -7,7 +6,6 @@ import send_message from '../workers/send_message.js';
 import logger from '../helpers/logger.js';
 
 const gateway_url = 'wss://gateway.discord.gg/?encoding=json&v=9';
-let inflate = new zlib.Inflate({ chunkSize: 65535, flush: zlib.Z_SYNC_FLUSH });
 var ws;
 
 export default () => {
@@ -28,20 +26,8 @@ export default () => {
     });
 
     function handle_message(data) {
-        if (data instanceof ArrayBuffer) {
-            const messages = [];
-            inflate.push(data, zlib.Z_SYNC_FLUSH);
-            if (inflate.result) {
-                const message = JSON.parse(inflate.result.toString());
-                messages.push(message);
-            }
-            for (let message of messages) {
-                process_message(message);
-            }
-        } else {
-            const message = JSON.parse(data);
-            process_message(message);
-        }
+        const message = JSON.parse(data);
+        process_message(message);
     }
 
     function process_message(message) {
