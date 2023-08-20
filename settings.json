@@ -1,0 +1,5 @@
+{
+    "account_token": "DISCORD_ACCOUNT_TOKEN",
+    "user_agent": "YOUR_BROWSER_USER_AGENT",
+    "discord_guild": "DISCORD_MIRROR_GUILD_ID"
+}
