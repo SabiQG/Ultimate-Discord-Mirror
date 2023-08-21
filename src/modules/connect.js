@@ -34,7 +34,7 @@ export default function init_webSocket() {
 
     function handle_close(code, reason) {
         logger(`WebSocket Closed. Code: ${code}, Reason: ${reason}`);
-        if (code === 1001) {
+        if (code === 1001 || code === 1006) {
             setTimeout(init_webSocket, RECONNECT_DELAY);
         }
     }
