@@ -8,14 +8,15 @@ const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const PAUSE_DURATION = 1500;
 
 export default async (message) => {
-    const payload = construct_payload(message);
+    const data = await read_data();
+    const payload = construct_payload(message, data);
     logger(`New message from "${payload.username}" at "${message.channel_id}".`);
-    const webhook = await get_webhook(message.channel_id);
+    const webhook = await get_webhook(message.channel_id, data);
     var {statusCode} = await guild_actions.send_mensage(payload, webhook);
     if (statusCode !== 204) logger(`Error sending webhook from "${payload.username}" at "${message.channel_id}".`);
 }
 
-function construct_payload({ content, embeds, attachments, author, sticker_items }) {
+function construct_payload({ content, embeds, attachments, author, sticker_items }, data) {
     if (attachments.length > 0) {
         for (let attachment of attachments) {
             if (attachment.content_type.includes("image/")) {
@@ -43,6 +44,9 @@ function construct_payload({ content, embeds, attachments, author, sticker_items
 
     embeds = embeds.filter((data) => data.type !== 'gifv');
 
+    content = replace_tag_channels(content, data);
+    embeds = JSON.parse(replace_tag_channels(JSON.stringify(embeds), data));
+
     return {
         content,
         embeds,
@@ -53,9 +57,14 @@ function construct_payload({ content, embeds, attachments, author, sticker_items
     };
 }
 
-async function get_webhook(channel_id) {
-    const filePath = `${process.env.PRELOAD_FILE_PATH}/${process.env.discord_guild}.json`;
-    const data = await read_data(filePath);
+function replace_tag_channels(payload, data) {
+    return payload.replace(/<#(\d+)>/g, function(match, number) {
+        if (data.channels[number]) return '<#' + data.channels[number].id + '>';
+        return match;
+    });
+}
+
+async function get_webhook(channel_id, data) {
 
     if (data.channels[channel_id] && data.channels[channel_id].url) {
         return data.channels[channel_id].url;
@@ -85,7 +94,8 @@ async function process_channel(data, channel_id) {
     data.channels[channel_id] = { id };
 }
 
-async function read_data(path) {
+async function read_data() {
+    const path = `${process.env.PRELOAD_FILE_PATH}/${process.env.discord_guild}.json`;
     const rawData = await fs.readFile(path, 'utf-8');
     return JSON.parse(rawData);
 }
