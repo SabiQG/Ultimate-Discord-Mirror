@@ -77,7 +77,7 @@ async function get_webhook(channel_id, data) {
     const { url } = await guild_actions.get_webhook(data.channels[channel_id].id);
     if (url) {
         data.channels[channel_id].url = url;
-        await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+        await fs.writeFile(process.env.file_path, JSON.stringify(data, null, 2));
         return url;
     }
 }
@@ -95,7 +95,6 @@ async function process_channel(data, channel_id) {
 }
 
 async function read_data() {
-    const path = `${process.env.PRELOAD_FILE_PATH}/${process.env.discord_guild}.json`;
-    const rawData = await fs.readFile(path, 'utf-8');
+    const rawData = await fs.readFile(process.env.file_path, 'utf-8');
     return JSON.parse(rawData);
 }

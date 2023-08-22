@@ -31,6 +31,7 @@ function set_env(accountData) {
     process.env.account_token = accountData.account_token;
     process.env.user_agent = accountData.user_agent;
     process.env.discord_guild = accountData.discord_guild;
+    process.env.file_path = `${process.env.PRELOAD_FILE_PATH}/${accountData.discord_guild}.json`;
 }
 
 async function check_preload(filePath) {
